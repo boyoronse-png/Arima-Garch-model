@@ -6,14 +6,14 @@
 library(quantmod)
 library(rugarch)
 library(tseries)                                     
-library(ggplot2)
+
 # =========================
 # DOWNLOAD DATA
 # =========================
 aapl_xts <-(
   getSymbols("AAPL", from = "2010-01-01",           
-             src = "yahoo", auto.assign = FALSE)                                    
-)
+             src = "yahoo", auto.assign = FALSE),                                       
+  )
 
 head(aapl_xts)
 tail(aapl_xts)
@@ -48,19 +48,19 @@ coef_table <- function(fit, robust = TRUE) {
 run_diagnostics <- function(fit, lags = 10) {
   cat("\n--- Info Criteria (AIC/BIC/etc.) ---\n")
   print(infocriteria(fit))                           # Returns named vector: Akaike, Bayes (BIC), Shibata, Hannan–Quinn.
-  
+
   z  <- residuals(fit, standardize = TRUE)           # Standardized residuals.
   z2 <- z^2                                          # Square them: used to detect remaining volatility structure (ARCH).
-  
+
   cat("\n--- Ljung-Box on standardized residuals ---\n")
   print(Box.test(z,  lag = lags, type = "Ljung-Box")) #H0: no autocorrelation up to 'lags'. High p => good (mean modeled well).
-  
+
   cat("\n--- Ljung-Box on standardized squared residuals ---\n")
   print(Box.test(z2, lag = lags, type = "Ljung-Box"))# H0: no autocorrelation in z^2. High p => good (variance modeled well).
-  
+
   cat("\n--- Nyblom Stability Test ---\n")
   print(nyblom(fit))                                 # Tests for parameter constancy. Report which params have low p (unstable).
-  
+
   cat("\n--- Distribution GoF via PIT + KS (Uniform[0,1]) ---\n")
   pit_vals <- tryCatch(pit(fit),                     # PIT maps standardized residuals through the assumed CDF.
                        error = function(e) rep(NA_real_, length(z)))
@@ -140,34 +140,3 @@ cat("\n=========================\nCAT: sGARCH(1,1) with mean (0,0), normal\n====
 cat("\n--- Coefficients (robust SEs) ---\n")
 print(coef_table(fit_CAT, robust = TRUE))            # Robust coefficient table for CAT.
 run_diagnostics(fit_CAT, lags = 10)                  # Diagnostics for CAT.
-
-# ==========================
-# SAVE PLOTS (ROBUST EXPORT)
-# ==========================
-if (!dir.exists("images")) dir.create("images")
-
-# Convert xts to data.frame for ggplot
-df_ret <- data.frame(
-  date = as.Date(index(ret_AAPL)),
-  r    = as.numeric(ret_AAPL)
-)
-
-p_ret <- ggplot(df_ret, aes(x = date, y = r)) +
-  geom_line() +
-  labs(title = "AAPL Log Returns", x = NULL, y = "Return")
-
-ggsave("images/aapl_returns.png", plot = p_ret, width = 10, height = 6, dpi = 150)
-
-# Volatility (sigma) from rugarch fit
-sig <- sigma(fit_AAPL)
-df_sig <- data.frame(
-  date = as.Date(index(sig)),
-  sigma = as.numeric(sig)
-)
-
-p_sig <- ggplot(df_sig, aes(x = date, y = sigma)) +
-  geom_line() +
-  labs(title = "AAPL Conditional Volatility (sigma)", x = NULL, y = "Sigma")
-
-ggsave("images/aapl_volatility.png", plot = p_sig, width = 10, height = 6, dpi = 150)
-
