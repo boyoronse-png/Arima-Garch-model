@@ -19,9 +19,13 @@ Log returns are used instead of raw prices because financial returns are typical
 ## Methodology Overview
 
 -Daily adjusted closing prices for Apple (AAPL) and Caterpillar (CAT) were obtained from Yahoo Finance.
+
 -Logarithmic returns were computed to obtain a stationary return series.
+
 -ARMA models were used to capture potential serial dependence in the mean return process.
+
 -GARCH-type models were estimated to capture time-varying volatility.
+
 -Diagnostic tests were conducted to evaluate model adequacy.
 
 
