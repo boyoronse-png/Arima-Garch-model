@@ -8,11 +8,11 @@ Daily price data for Apple (AAPL) and Caterpillar (CAT) are obtained from Yahoo 
 
 ## (Data and Pre-processing)
 
-Daily adjusted closing prices are downloaded using the `quantmod` package in R. Log returns are computed using the standard transformation:
+-Daily adjusted closing prices are downloaded using the `quantmod` package in R.
+-Rugarch for model estimation.
+-tseries for time series analysis and diagnostic testing.
+-ggplot for data visualisation.
 
-r_t = log(P_t) − log(P_{t−1})
-
-where (P_t) represents the adjusted closing price at time (t).
 
 Log returns are used instead of raw prices because financial returns are typically stationary, while price levels often follow non-stationary processes.
 
